@@ -9,7 +9,7 @@ import java.util.Set;
  * Time: 20:35
  * To change this template use File | Settings | File Templates.
  */
-public class SimpleMap<K extends Comparable<K>,V> implements Map<K,V> {
+public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> implements Map<K, V> {
 
     /**
      * Returns the number of key-value mappings in this map.  If the
@@ -18,9 +18,27 @@ public class SimpleMap<K extends Comparable<K>,V> implements Map<K,V> {
      *
      * @return the number of key-value mappings in this map
      */
-    @Override
+
+    private Node<K, V> root = null;
+
+    private int m_size;
+
+    static class Node<K, V> {
+        private K key;
+        private V value;
+        Node<K, V> left;
+        Node<K, V> right;
+
+        Node(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+
+    }
+
     public int size() {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        return m_size;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     /**
@@ -30,7 +48,10 @@ public class SimpleMap<K extends Comparable<K>,V> implements Map<K,V> {
      */
     @Override
     public boolean isEmpty() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        if (m_size == 0) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -52,7 +73,22 @@ public class SimpleMap<K extends Comparable<K>,V> implements Map<K,V> {
      */
     @Override
     public boolean containsKey(Object key) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        if (key == null) throw new NullPointerException();
+        K k = (K) key;
+        Node<K, V> current = root;
+
+        while (current != null) {
+            int compareInt = k.compareTo(current.key);
+            if (compareInt == 0) {
+                return true;
+            }
+            if (compareInt < 0) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+        }
+        return false;
     }
 
     /**
@@ -75,7 +111,22 @@ public class SimpleMap<K extends Comparable<K>,V> implements Map<K,V> {
      */
     @Override
     public boolean containsValue(Object value) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        if (value == null) throw new NullPointerException();
+        V v = (V) value;
+        Node<K, V> current = root;
+
+        while (current != null) {
+            int compareInt = v.compareTo(current.value);
+            if (compareInt == 0) {
+                return true;
+            }
+            if (compareInt < 0) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+        }
+        return false;
     }
 
     /**
@@ -105,7 +156,24 @@ public class SimpleMap<K extends Comparable<K>,V> implements Map<K,V> {
      */
     @Override
     public V get(Object key) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        if (key == null) throw new NullPointerException();
+        K k = (K) key;
+        Node<K, V> current = root;
+
+        while (current != null) {
+            int compareInt = k.compareTo(current.key);
+            if (compareInt == 0) {
+                return current.value;
+            }
+            if (compareInt < 0) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+        }
+
+
+        return null;
     }
 
     /**
@@ -134,7 +202,39 @@ public class SimpleMap<K extends Comparable<K>,V> implements Map<K,V> {
      */
     @Override
     public V put(K key, V value) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        if (key == null) throw new NullPointerException();
+
+        Node<K, V> current = root;
+        Node<K, V> myNode = null;
+        V returnValue = null;
+        while (current != null) {
+            int compareInt = key.compareTo(current.key);
+            if (compareInt == 0) {
+                returnValue = current.value;
+                current.value = value;
+                return returnValue;
+            } else {
+                myNode = current;
+                if (compareInt < 0) {
+                    current = current.left;
+                } else {
+                    current = current.right;
+                }
+            }
+        }
+        Node<K, V> newNode = new Node<K, V>(key, value);
+
+        if (myNode == null) {
+            root = newNode;
+        } else {
+            if (key.compareTo(current.key) < 0) {
+                myNode.left = newNode;
+            } else {
+                myNode.right = newNode;
+            }
+        }
+        m_size++;
+        return null;
     }
 
     /**
@@ -155,7 +255,6 @@ public class SimpleMap<K extends Comparable<K>,V> implements Map<K,V> {
      * <p>The map will not contain a mapping for the specified key once the
      * call returns.
      *
-     * @param key key whose mapping is to be removed from the map
      * @return the previous value associated with <tt>key</tt>, or
      *         <tt>null</tt> if there was no mapping for <tt>key</tt>.
      * @throws UnsupportedOperationException if the <tt>remove</tt> operation
@@ -168,8 +267,62 @@ public class SimpleMap<K extends Comparable<K>,V> implements Map<K,V> {
      *                                       (<a href="Collection.html#optional-restrictions">optional</a>)
      */
     @Override
-    public V remove(Object key) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public V remove(Object K) {
+        if (K == null) throw new NullPointerException();
+        //if (K instanceof )
+        Node<K, V> current = root;
+        Node<K, V> myNode = null;
+        K key = (K) K;
+        V returnValue = null;
+        while (current != null) {
+            int compareInt = key.compareTo(current.key);
+            if (compareInt == 0) {
+                myNode = current;
+                break;
+            } else {
+                if (compareInt < 0) {
+                    current = current.left;
+                } else {
+                    current = current.right;
+                }
+            }
+        }
+            if (current == null) return null;
+
+            if (current.right == null) {
+                if (myNode == null) {
+                    root = current.left;
+                } else {
+                    if (current == myNode.left) {
+                        myNode.left = current.left;
+                    } else {
+                        myNode.right = current.left;
+                    }
+                }
+            } else {
+                Node<K, V> rightMin = current.right;
+                myNode = null;
+                while (rightMin.left != null) {
+                    myNode = rightMin;
+                    rightMin = rightMin.left;
+                }
+                if (myNode != null) {
+                    myNode.left = rightMin.left;
+                } else {
+                    current.right = rightMin.right;
+                }
+
+                returnValue = current.value;
+
+                current.key = rightMin.key;
+                current.value = rightMin.value;
+                m_size--;
+
+            }
+
+
+        return returnValue;
+
     }
 
     /**
@@ -205,7 +358,8 @@ public class SimpleMap<K extends Comparable<K>,V> implements Map<K,V> {
      */
     @Override
     public void clear() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        root = null;
+        m_size=0;
     }
 
     /**
@@ -268,4 +422,5 @@ public class SimpleMap<K extends Comparable<K>,V> implements Map<K,V> {
     public Set<Entry<K, V>> entrySet() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
+
 }
