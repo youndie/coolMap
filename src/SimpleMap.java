@@ -28,6 +28,7 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
         private V value;
         Node<K, V> left;
         Node<K, V> right;
+        Node<K, V> parent;
 
         Node(K key, V value) {
             this.key = key;
@@ -234,6 +235,7 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
             }
         }
         m_size++;
+        myNode.parent = newNode;
         return null;
     }
 
