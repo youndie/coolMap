@@ -30,6 +30,7 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
         Node<K, V> right;
         Node<K, V> parent;
 
+
         Node(K key, V value) {
             this.key = key;
             this.value = value;
@@ -425,4 +426,13 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    public void rotateRight(Node<K,V> x)
+    {
+        Node<K,V> y = x.left;
+        x.left = y.left;
+        if (node)
+
+    }
 }
+
+
