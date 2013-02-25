@@ -229,14 +229,15 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
         if (myNode == null) {
             root = newNode;
         } else {
-            if (key.compareTo(current.key) < 0) {
+            newNode.parent = myNode;
+            if (key.compareTo(myNode.key) < 0) {
                 myNode.left = newNode;
             } else {
                 myNode.right = newNode;
             }
         }
         m_size++;
-        myNode.parent = newNode;
+
         return null;
     }
 
@@ -429,10 +430,43 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
     public void rotateRight(Node<K,V> x)
     {
         Node<K,V> y = x.left;
-        x.left = y.left;
-        if (node)
+        x.left = y.right;
+        if (y.right != null) y.right.parent=x;
+        if (y != null) y.parent = x.parent;
+        if (x.parent != null)  {
+            if (x==x.parent.right)
+                x.parent.right=y;
+            else
+                x.parent.left=y;
+        }   else {
+            root=y;
+        }
 
+        y.right = x;
+        if (x != null) x.parent = y;
     }
+
+
+    public void rotateLeft(Node<K,V> x)
+    {
+        Node<K,V> y = x.right;
+        x.right = y.left;
+        if (y.left != null) y.left.parent=x;
+        if (y != null) y.parent = x.parent;
+        if (x.parent != null)  {
+            if (x==x.parent.left)
+                x.parent.left=y;
+            else
+                x.parent.right=y;
+        }   else {
+            root=y;
+        }
+
+        y.left = x;
+        if (x != null) x.parent = y;
+    }
+
+
 }
 
 
