@@ -2,6 +2,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+
 /**
  * Created with IntelliJ IDEA.
  * User: Youndie
@@ -20,15 +21,27 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
      */
 
     private Node<K, V> root = null;
-
+    enum Color { red, black }
     private int m_size;
+
+    static private Node NIL;
+
+    public SimpleMap()
+    {
+        NIL = new Node<K,V>();
+        root = NIL;
+    }
+
 
     static class Node<K, V> {
         private K key;
         private V value;
-        Node<K, V> left;
-        Node<K, V> right;
-        Node<K, V> parent;
+        private Node<K, V> left = NIL;
+        private Node<K, V> right = NIL;
+        private Node<K, V> parent;
+
+
+        private Color color=Color.black;
 
 
         Node(K key, V value) {
@@ -36,7 +49,8 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
             this.value = value;
         }
 
-
+        Node() {
+        }
     }
 
     public int size() {
@@ -207,9 +221,9 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
         if (key == null) throw new NullPointerException();
 
         Node<K, V> current = root;
-        Node<K, V> myNode = null;
+        Node<K, V> myNode = NIL;
         V returnValue = null;
-        while (current != null) {
+        while (current != NIL) {
             int compareInt = key.compareTo(current.key);
             if (compareInt == 0) {
                 returnValue = current.value;
@@ -226,7 +240,10 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
         }
         Node<K, V> newNode = new Node<K, V>(key, value);
 
-        if (myNode == null) {
+
+        newNode.color = Color.red;
+
+        if (myNode == NIL) {
             root = newNode;
         } else {
             newNode.parent = myNode;
@@ -237,6 +254,8 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
             }
         }
         m_size++;
+
+        insertFix(newNode);
 
         return null;
     }
@@ -291,10 +310,10 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
                 }
             }
         }
-            if (current == null) return null;
+            if (current == NIL) return null;
 
-            if (current.right == null) {
-                if (myNode == null) {
+            if (current.right == NIL) {
+                if (myNode == NIL) {
                     root = current.left;
                 } else {
                     if (current == myNode.left) {
@@ -305,12 +324,12 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
                 }
             } else {
                 Node<K, V> rightMin = current.right;
-                myNode = null;
-                while (rightMin.left != null) {
+                myNode = NIL;
+                while (rightMin.left != NIL) {
                     myNode = rightMin;
                     rightMin = rightMin.left;
                 }
-                if (myNode != null) {
+                if (myNode != NIL) {
                     myNode.left = rightMin.left;
                 } else {
                     current.right = rightMin.right;
@@ -427,7 +446,7 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void rotateRight(Node<K,V> x)
+    private void rotateRight(Node<K,V> x)
     {
         Node<K,V> y = x.left;
         x.left = y.right;
@@ -447,7 +466,7 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
     }
 
 
-    public void rotateLeft(Node<K,V> x)
+    private void rotateLeft(Node<K,V> x)
     {
         Node<K,V> y = x.right;
         x.right = y.left;
@@ -466,6 +485,83 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
         if (x != null) x.parent = y;
     }
 
+    Node<K,V> grandparent(Node<K,V> n)
+    {
+        if ((n != null) && (n.parent != null))
+            return n.parent.parent;
+        else
+            return null;
+    }
+
+    Node<K,V> uncle(Node<K,V> n)
+    {
+        Node<K,V> g = grandparent(n);
+        if (g == null)
+            return null; // No grandparent means no uncle
+        if (n.parent == g.left)
+            return g.right;
+        else
+            return g.left;
+    }
+
+    private void insertFix(Node<K,V> x)
+    {
+        while (x!=root && x.parent.color==Color.red )        //пока не
+        {
+            if (x.parent == x.parent.parent.left)
+            {
+                //мы слева
+                Node<K,V> y = x.parent.parent.right;
+                if (y.color==Color.red)
+                {
+                    //дядя справа красный
+                    y.color = Color.black;
+                    x.parent.color = Color.black;
+                    x.parent.color = Color.red;
+                    x = x.parent.parent;
+                }
+                else
+                {
+                    //дядя справа чёрный
+                    if (x.parent.right == x)
+                    {
+                        x=x.parent;
+                        rotateLeft(x);
+                    }
+                    x.parent.color = Color.black;
+                    x.parent.parent.color = Color.red;
+                    rotateRight(x);
+                }
+
+            }
+            else
+            {
+                Node<K,V> y = x.parent.parent.left;
+                if (y.color==Color.red)
+                {
+                    //дядя справа красный
+                    y.color = Color.black;
+                    x.parent.color = Color.black;
+                    x.parent.color = Color.red;
+                    x = x.parent.parent;
+                }
+                else
+                {
+                    //дядя справа чёрный
+                    if (x.parent.left == x)
+                    {
+                        x=x.parent;
+                        rotateLeft(x);
+                    }
+                    x.parent.color = Color.black;
+                    x.parent.parent.color = Color.red;
+                    rotateLeft(x);
+                }
+            }
+
+        }
+        root.color = Color.black;
+    }
 
 }
 
