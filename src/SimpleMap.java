@@ -29,6 +29,7 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
     public SimpleMap()
     {
         NIL = new Node<K,V>();
+
         root = NIL;
     }
 
@@ -39,7 +40,8 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
         private Node<K, V> left = NIL;
         private Node<K, V> right = NIL;
         private Node<K, V> parent;
-
+//        NIL.left = NIL;
+//        NIL.right = NIL;
 
         private Color color=Color.black;
 
@@ -176,7 +178,7 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
         K k = (K) key;
         Node<K, V> current = root;
 
-        while (current != null) {
+        while (current != NIL) {
             int compareInt = k.compareTo(current.key);
             if (compareInt == 0) {
                 return current.value;
@@ -450,7 +452,7 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
     {
         Node<K,V> y = x.left;
         x.left = y.right;
-        if (y.right != null) y.right.parent=x;
+        if (y.right!=null) y.right.parent=x;
         if (y != null) y.parent = x.parent;
         if (x.parent != null)  {
             if (x==x.parent.right)
@@ -464,13 +466,11 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
         y.right = x;
         if (x != null) x.parent = y;
     }
-
-
     private void rotateLeft(Node<K,V> x)
     {
         Node<K,V> y = x.right;
         x.right = y.left;
-        if (y.left != null) y.left.parent=x;
+        if (y.left!=null) y.left.parent=x;
         if (y != null) y.parent = x.parent;
         if (x.parent != null)  {
             if (x==x.parent.left)
@@ -485,28 +485,10 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
         if (x != null) x.parent = y;
     }
 
-    Node<K,V> grandparent(Node<K,V> n)
-    {
-        if ((n != null) && (n.parent != null))
-            return n.parent.parent;
-        else
-            return null;
-    }
-
-    Node<K,V> uncle(Node<K,V> n)
-    {
-        Node<K,V> g = grandparent(n);
-        if (g == null)
-            return null; // No grandparent means no uncle
-        if (n.parent == g.left)
-            return g.right;
-        else
-            return g.left;
-    }
-
     private void insertFix(Node<K,V> x)
     {
-        while (x!=root && x.parent.color==Color.red )        //пока не
+        x.color = Color.red;
+        while (x != null && x!=root && x.parent.color==Color.red )
         {
             if (x.parent == x.parent.parent.left)
             {
@@ -517,11 +499,12 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
                     //дядя справа красный
                     y.color = Color.black;
                     x.parent.color = Color.black;
-                    x.parent.color = Color.red;
+                    x.parent.parent.color = Color.red;
                     x = x.parent.parent;
                 }
                 else
                 {
+
                     //дядя справа чёрный
                     if (x.parent.right == x)
                     {
@@ -530,7 +513,7 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
                     }
                     x.parent.color = Color.black;
                     x.parent.parent.color = Color.red;
-                    rotateRight(x);
+                    rotateRight(x.parent.parent);
                 }
 
             }
@@ -539,10 +522,9 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
                 Node<K,V> y = x.parent.parent.left;
                 if (y.color==Color.red)
                 {
-                    //дядя справа красный
                     y.color = Color.black;
                     x.parent.color = Color.black;
-                    x.parent.color = Color.red;
+                    x.parent.parent.color = Color.red;
                     x = x.parent.parent;
                 }
                 else
@@ -551,13 +533,20 @@ public class SimpleMap<K extends Comparable<K>, V extends Comparable<V>> impleme
                     if (x.parent.left == x)
                     {
                         x=x.parent;
-                        rotateLeft(x);
+                        rotateRight(x);
                     }
                     x.parent.color = Color.black;
                     x.parent.parent.color = Color.red;
-                    rotateLeft(x);
+                    rotateLeft(x.parent.parent);
+
+
+
+
                 }
+
+
             }
+
 
         }
         root.color = Color.black;
