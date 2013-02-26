@@ -13,7 +13,7 @@ import java.util.TreeMap;
  */
 
 public class mapTest extends Assert {
-    private Map<Integer, Integer> testMap = new SimpleMap<Integer, Integer>();
+    private Map<Integer, Integer> testMap = new RedBlackTree<Integer, Integer>();
     private Map<Integer, Integer> controlMap = new TreeMap<Integer, Integer>();
     Integer[] values;
     Integer[] keys;
