@@ -8,7 +8,6 @@ import java.util.Set;
  * User: Youndie
  * Date: 16.02.13
  * Time: 20:35
- * To change this template use File | Settings | File Templates.
  */
 public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> implements Map<K, V> {
 
@@ -291,69 +290,10 @@ public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> impl
      *                                       map does not permit null keys
      *                                       (<a href="Collection.html#optional-restrictions">optional</a>)
      */
-    @Override
-    public V remove(Object K) {
-        if (K == null) throw new NullPointerException();
-        //if (K instanceof )
-        Node<K, V> current = root;
-        Node<K, V> myNode = null;
-        K key = (K) K;
-        V returnValue = null;
-        while (current != null) {
-            int compareInt = key.compareTo(current.key);
-            if (compareInt == 0) {
-                myNode = current;
-                break;
-            } else {
-                if (compareInt < 0) {
-                    current = current.left;
-                } else {
-                    current = current.right;
-                }
-            }
-        }
-            if (current == NIL) return null;
-
-            if (current.right == NIL) {
-                if (myNode == NIL) {
-                    root = current.left;
-                } else {
-                    if (current == myNode.left) {
-                        myNode.left = current.left;
-                    } else {
-                        myNode.right = current.left;
-                    }
-                }
-            } else {
-                Node<K, V> rightMin = current.right;
-                myNode = NIL;
-                while (rightMin.left != NIL) {
-                    myNode = rightMin;
-                    rightMin = rightMin.left;
-                }
-                if (myNode != NIL) {
-                    myNode.left = rightMin.left;
-                } else {
-                    current.right = rightMin.right;
-                }
-
-                returnValue = current.value;
-
-                current.key = rightMin.key;
-                current.value = rightMin.value;
-                m_size--;
-
-            }
-
-
-        return returnValue;
-
-    }
-
     /**
      * Copies all of the mappings from the specified map to this map
      * (optional operation).  The effect of this call is equivalent to that
-     * of calling {@link #put(Object, Object) put(k, v)} on this map once
+     * of calling {@link #n(Object, Object) put(k, v)} on this map once
      * for each mapping from key <tt>k</tt> to value <tt>v</tt> in the
      * specified map.  The behavior of this operation is undefined if the
      * specified map is modified while the operation is in progress.
@@ -370,6 +310,60 @@ public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> impl
      *                                       the specified map prevents it from being stored in this map
      */
     @Override
+    public V remove(Object K)  {
+        if (K == null) throw new NullPointerException();
+        Node<K, V> current = root;
+        Node<K, V> myNode = NIL;
+        K k = (K) K;
+        while (current != NIL) {
+            int cmp = k.compareTo(current.key);
+            if (cmp == 0) {
+                break;
+            } else {
+                myNode = current;
+                if (cmp < 0) {
+                    current = current.left;
+                } else {
+                    current = current.right;
+                }
+            }
+        }
+        if (current == NIL) {
+            return null;
+        }
+        m_size--;
+        V returnValue = current.value;
+        if (current.right == NIL) {
+            if (myNode == NIL) {
+                root = current.left;
+            } else {
+                if (current == myNode.left) {
+                    myNode.left = current.left;
+                } else {
+                    myNode.right = current.left;
+                }
+            }
+        } else {
+            Node<K, V> rightMin = current.right;
+            myNode = NIL;
+            while (rightMin.left != NIL) {
+                myNode = rightMin;
+                rightMin = rightMin.left;
+            }
+            if (myNode != NIL) {
+                myNode.left = rightMin.right;
+            } else {
+                current.right = rightMin.right;
+            }
+            current.key = rightMin.key;
+            current.value = rightMin.value;
+        }
+        removeFix(current);
+        return returnValue;
+    }
+
+
+
     public void putAll(Map<? extends K, ? extends V> m) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -549,6 +543,63 @@ public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> impl
 
         }
         root.color = Color.black;
+    }
+
+    private void removeFix(Node<K,V> x)
+    {
+        while (x != root && x.color == Color.black && x!=NIL) {
+            if (x == x.parent.left) {
+                Node<K,V> myNode = x.parent.right;
+                if (x.color == Color.red) {
+                    myNode.color = Color.black;
+                    x.parent.color = Color.red;
+                    rotateLeft (x.parent);
+                    myNode = x.parent.right;
+                }
+                if (myNode.left.color == Color.black && myNode.right.color == Color.black) {
+                    myNode.color = Color.red;
+                    x = x.parent;
+                } else {
+                    if (myNode.right.color == Color.black) {
+                        myNode.left.color = Color.black;
+                        myNode.color = Color.red;
+                        rotateRight (myNode);
+                        myNode = x.parent.right;
+                    }
+                    myNode.color = x.parent.color;
+                    x.parent.color = Color.black;
+                    myNode.right.color = Color.black;
+                    rotateLeft (x.parent);
+                    x = root;
+                }
+            } else {
+                Node myNode = x.parent.left;
+                if (myNode.color == Color.red) {
+                    myNode.color = Color.black;
+                    x.parent.color = Color.red;
+                    rotateRight (x.parent);
+                    myNode = x.parent.left;
+                }
+                if (myNode.right.color == Color.black && myNode.left.color == Color.black) {
+                    myNode.color = Color.red;
+                    x = x.parent;
+                } else {
+                    if (myNode.left.color == Color.black) {
+                        myNode.right.color = Color.black;
+                        myNode.color = Color.red;
+                        rotateLeft (myNode);
+                        myNode = x.parent.left;
+                    }
+                    myNode.color = x.parent.color;
+                    x.parent.color = Color.black;
+                    myNode.left.color = Color.black;
+                    rotateRight (x.parent);
+                    x = root;
+                }
+            }
+        }
+        x.color = Color.black;
+
     }
 
 }
