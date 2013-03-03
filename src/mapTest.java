@@ -27,7 +27,7 @@ public class mapTest extends Assert {
         keys = new Integer[size];
         for (int i = 0; i < size; i++) {
 
-            keys[i] = random.nextInt(100);
+            keys[i] = random.nextInt(25);
             values[i] = random.nextInt();
         }
     }
@@ -261,13 +261,42 @@ public class mapTest extends Assert {
     @Test
     public void delTest_case5()
     {
-        String NODES = "5 2 25 1 4 17 26 16 18";
+
+        String NODES = "17 5 15 7 13";
         for (int i=0;i<NODES.split(" ").length;i++)
         {
             putNode(Integer.parseInt(NODES.split(" ")[i]));
         }
-        delNode(18);
+        delNode(17);  //чёрный предок чёрный брат чёрные сыновья
+        delNode(5);   //чёрный предок чёрный брат чёрные сыновья (сим)
+        putNode(6);
+        delNode(13);
+        delNode(6);
+
+
+//        for (int i = 0;i<5;i++)
+//        {
+//            putNode(keys[i]);
+//            System.out.println(keys[i]);
+//        }
+//
+//        for (int i = 0;i<5;i++)
+//        {
+//            delNode(keys[i]);
+//        }
+
     }
+
+//    public void delTest_case6()
+//    {
+//        String NODES = "17 5 15 7 13";
+//        for (int i=0;i<NODES.split(" ").length;i++)
+//        {
+//            putNode(Integer.parseInt(NODES.split(" ")[i]));
+//        }
+//         delNode(17);
+//        delNode(15);
+//    }
 
 
     public void delNode(int key)
