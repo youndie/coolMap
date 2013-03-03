@@ -71,20 +71,32 @@ public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> impl
         V v = (V) value;
         Node<K, V> current = root;
 
-        while (current != NIL) {
-            int compareInt = v.compareTo(current.value);
-            if (compareInt == 0) {
-                return true;
-            }
-            if (compareInt < 0) {
-                current = current.left;
-            } else {
-                current = current.right;
-            }
+        while (current.left != NIL) current=current.left;
+        while (current!=null)
+        {
+            if(current.value==value)return true;
+            current= nextNode(current);
         }
         return false;
     }
 
+    private  Node<K,V> nextNode(Node<K,V> current) {
+        if (current == NIL) return null;
+        else if (current.right != NIL) {
+            Node<K,V> rightNode = current.right;
+            while (rightNode.left != NIL)
+                rightNode = rightNode.left;
+            return rightNode;
+        } else {
+            Node<K,V> parentNode = current.parent;
+            Node<K,V> node = current;
+            while (parentNode != null && node == parentNode.right) {
+                node = parentNode;
+                parentNode = parentNode.parent;
+            }
+            return parentNode;
+        }
+    }
 
     private Node<K, V> getNode(Object key) {
         if (key == null) throw new NullPointerException();
@@ -214,7 +226,7 @@ public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> impl
 
     @Override
     public void clear() {
-        root = null;
+        root = NIL;
         m_size = 0;
     }
 
