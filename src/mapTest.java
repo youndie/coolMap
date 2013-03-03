@@ -270,8 +270,8 @@ public class mapTest extends Assert {
         delNode(17);  //чёрный предок чёрный брат чёрные сыновья
         delNode(5);   //чёрный предок чёрный брат чёрные сыновья (сим)
         putNode(6);
-        delNode(13);
-        delNode(6);
+
+        delNode(13);  //чёрные сыновья чёрный брат красный предок
 
 
 //        for (int i = 0;i<5;i++)
