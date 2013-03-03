@@ -14,7 +14,7 @@ import java.util.TreeMap;
  */
 
 public class mapTest extends Assert {
-    private Map<Integer, Integer> testMap = new RedBlackTree<Integer, Integer>();
+    private RedBlackTree<Integer, Integer> testMap = new RedBlackTree<Integer, Integer>();
     private Map<Integer, Integer> controlMap = new TreeMap<Integer, Integer>();
     Integer[] values;
     Integer[] keys;
@@ -22,12 +22,12 @@ public class mapTest extends Assert {
     @Before
     public void generateData() {
         Random random = new Random();
-        int size = 100;
+        int size = 1000;
         values = new Integer[size];
         keys = new Integer[size];
         for (int i = 0; i < size; i++) {
 
-            keys[i] = random.nextInt();
+            keys[i] = random.nextInt(100);
             values[i] = random.nextInt();
         }
     }
@@ -35,7 +35,8 @@ public class mapTest extends Assert {
     private void checkMap(Map<Integer, Integer> a, Map<Integer, Integer> b) {
         assertEquals("Size", a.size(), b.size());
         for (Integer key : b.keySet()) {
-            assertEquals("Value for key " + key.toString(), b.get(key),a.get(key));
+            assertEquals("Value for key " + key.toString(), b.get(key), a.get(key));
+
         }
 
 
@@ -52,19 +53,32 @@ public class mapTest extends Assert {
     }
 
     @Test
-    public void delTest() {
-
-       putNode(1);
+    public void delTest1()
+    {
+        putNode(95);
         putNode(2);
-        putNode(3);
-        putNode(4);
-        putNode(5);
-        putNode(6);
-        putNode(7);
+        putNode(27);
+        putNode(60);
+        putNode(62);
 
-        delNode(3);
+        delNode(95);
+        delNode(2);
+        checkMap(testMap,controlMap);
+    }
 
+    @Test
+    public void delTest() {
+        for (int i = 0; i < keys.length; i++) {
+            testMap.put(keys[i], values[i]);
+            controlMap.put(keys[i], values[i]);
+        }
+
+        for (int i = 0; i < keys.length; i++) {
+            testMap.remove(keys[i]);
+            controlMap.remove(keys[i]);
             checkMap(testMap, controlMap);
+        }
+//
 
     }
 
