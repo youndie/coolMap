@@ -60,7 +60,6 @@ public class mapTest extends Assert {
         putNode(27);
         putNode(60);
         putNode(62);
-
         delNode(95);
         delNode(2);
         checkMap(testMap,controlMap);
@@ -79,7 +78,39 @@ public class mapTest extends Assert {
             checkMap(testMap, controlMap);
         }
 //
+        assertTrue(testMap.isEmpty());
 
+    }
+
+    @Test
+    public void containsTest()
+    {
+        putNode(5);
+        testMap.put(0,0);
+        assertEquals(testMap.containsKey(5),true);
+        assertEquals(testMap.containsKey(0),true);
+        assertEquals(testMap.containsKey(1),false);
+        assertEquals(testMap.containsValue(1),true);
+        assertEquals(testMap.containsValue(0),true);
+        assertEquals(testMap.containsValue(2),false);
+    }
+
+    @Test
+    public void cleanTest()
+    {
+        testMap.put(5,1);
+        assertFalse(testMap.isEmpty());
+        testMap.clear();
+        assertTrue(testMap.isEmpty());
+    }
+
+    @Test
+    public void dummiesTest()
+    {
+        assertNull(testMap.keySet());
+        assertNull(testMap.entrySet());
+        testMap.putAll(testMap);
+        assertNull(testMap.values());
     }
 
     public void delNode(int key)

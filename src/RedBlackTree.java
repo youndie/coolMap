@@ -12,7 +12,6 @@ import java.util.Set;
 public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> implements Map<K, V> {
 
 
-
     private Node<K, V> root = null;
 
     enum Color {red, black}
@@ -33,11 +32,7 @@ public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> impl
         private Node<K, V> left = NIL;
         private Node<K, V> right = NIL;
         private Node<K, V> parent;
-//        NIL.left = NIL;
-//        NIL.right = NIL;
-
         private Color color = Color.black;
-
 
         Node(K key, V value) {
             this.key = key;
@@ -49,7 +44,7 @@ public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> impl
     }
 
     public int size() {
-        return m_size;  //To change body of implemented methods use File | Settings | File Templates.
+        return m_size;
     }
 
 
@@ -65,20 +60,7 @@ public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> impl
     @Override
     public boolean containsKey(Object key) {
         if (key == null) throw new NullPointerException();
-        K k = (K) key;
-        Node<K, V> current = root;
-
-        while (current != null) {
-            int compareInt = k.compareTo(current.key);
-            if (compareInt == 0) {
-                return true;
-            }
-            if (compareInt < 0) {
-                current = current.left;
-            } else {
-                current = current.right;
-            }
-        }
+        if (getNode(key).key == key) return true;
         return false;
     }
 
@@ -89,7 +71,7 @@ public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> impl
         V v = (V) value;
         Node<K, V> current = root;
 
-        while (current != null) {
+        while (current != NIL) {
             int compareInt = v.compareTo(current.value);
             if (compareInt == 0) {
                 return true;
@@ -104,26 +86,30 @@ public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> impl
     }
 
 
-    @Override
-    public V get(Object key) {
+    private Node<K, V> getNode(Object key) {
         if (key == null) throw new NullPointerException();
         K k = (K) key;
         Node<K, V> current = root;
-
+        Node<K, V> myNode = NIL;
         while (current != NIL) {
             int compareInt = k.compareTo(current.key);
             if (compareInt == 0) {
-                return current.value;
+                return current;
             }
+            myNode = current;
             if (compareInt < 0) {
                 current = current.left;
             } else {
                 current = current.right;
             }
         }
+        return myNode;
+    }
 
-
-        return null;
+    @Override
+    public V get(Object key) {
+        if (key == null) throw new NullPointerException();
+        return getNode(key).value;
     }
 
 
@@ -134,21 +120,13 @@ public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> impl
         Node<K, V> current = root;
         Node<K, V> myNode = NIL;
         V returnValue = null;
-        while (current != NIL) {
-            int compareInt = key.compareTo(current.key);
-            if (compareInt == 0) {
-                returnValue = current.value;
-                current.value = value;
-                return returnValue;
-            } else {
-                myNode = current;
-                if (compareInt < 0) {
-                    current = current.left;
-                } else {
-                    current = current.right;
-                }
-            }
+        myNode = getNode(key);
+        if (myNode.key == key) {
+            returnValue = myNode.value;
+            myNode.value = value;
+            return returnValue;
         }
+
         Node<K, V> newNode = new Node<K, V>(key, value);
 
 
@@ -172,64 +150,62 @@ public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> impl
     }
 
 
-    @Override
-    public V remove(Object K) {
-        if (K == null) throw new NullPointerException();
-        Node<K, V> current = root;
-        Node<K, V> myNode = NIL;
+    private Node<K,V> findRightMin(Node<K,V> current)
+    {
+        Node<K,V> myNode;
+        myNode = current.right;
+        while (myNode.left != NIL) myNode = myNode.left;
+        return myNode;
+    }
+    private Node<K,V> delNode(Node<K, V> myNode){
         Node<K,V> node;
-        K k = (K) K;
-        while (current != NIL) {
-            int cmp = k.compareTo(current.key);
-            if (cmp == 0) {
-                break;
-            } else {
-                if (cmp < 0) {
-                    current = current.left;
-                } else {
-                    current = current.right;
-                }
-            }
-        }
-        if (current == NIL) {
-            return null;
-        }
-        m_size--;
-        V returnValue = current.value;
-
-        if (current==null || current==NIL) return null;
-        if (current.left == NIL ||current.right == NIL) {
-            myNode = current;
-        } else {
-            myNode = current.right;
-            while (myNode.left != NIL) myNode = myNode.left;
-        }
         if (myNode.left != NIL)
             node = myNode.left;
         else
             node = myNode.right;
         node.parent = myNode.parent;
-        if (myNode.parent!=null)
-        {
-            if (myNode==myNode.parent.left)
-            {
+        if (myNode.parent != null) {
+            if (myNode == myNode.parent.left) {
                 myNode.parent.left = node;
-            }
-            else myNode.parent.right = node;
+            } else myNode.parent.right = node;
+        } else root = node;
+        return node;
+    }
+    private Node<K,V> findMyNode(Node<K,V> current){
+        Node<K,V> myNode;
+        if (current.left == NIL || current.right == NIL) {
+            myNode = current;
+        } else {
+            myNode = findRightMin(current);
         }
-        else root = node;
-        if (myNode!=current)
-        {
+        return myNode;
+    }
+    @Override
+    public V remove(Object K) {
+        if (K == null) throw new NullPointerException();
+        Node<K, V> current = getNode(K);
+        Node<K, V> myNode;
+        Node<K, V> node;
+        if (current.key != K) {
+            return null;
+        }
+        m_size--;
+        V returnValue = current.value;
+
+
+        if (current == null || current == NIL) return null;
+        myNode = findMyNode(current);
+        node = delNode(myNode);
+
+        if (myNode != current) {
             current.key = myNode.key;
             current.value = myNode.value;
         }
-        if (myNode.color==Color.black)
-        {
+        if (myNode.color == Color.black) {
             removeFix(node);
         }
         return returnValue;
     }
-
 
     public void putAll(Map<? extends K, ? extends V> m) {
         //To change body of implemented methods use File | Settings | File Templates.
@@ -345,8 +321,6 @@ public class RedBlackTree<K extends Comparable<K>, V extends Comparable<V>> impl
         }
         root.color = Color.black;
     }
-
-
 
 
     private void removeFix(Node<K, V> x) {
