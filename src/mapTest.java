@@ -45,85 +45,47 @@ public class mapTest extends Assert {
     @Test
     public void doublePut()
     {
-        putNode(1);putNode(1);
-        chkMaps();
+        pushMaster(new int[]{1,1});
     }
 
 
     @Test
     public void redParentRedUnclePUTTest()
     {
-        putNode(5);
-        putNode(1);
-        putNode(6);
-        putNode(7);
-        chkMaps();
+        pushMaster(new int[]{5,1,6,7});
+        clearMaster();
+        pushMaster(new int[]{5,1,6,0});
+    }
 
+    private void clearMaster()
+    {
         controlMap.clear();
         testMap.clear();
-
-        putNode(5);
-        putNode(1);
-        putNode(6);
-        putNode(0);
-        chkMaps();
     }
+
 
     @Test
     public void redParentBlackUnclePUTTest()
     {
-        putNode(15);
-        putNode(17);
-        putNode(10);
-        putNode(13);
-        putNode(11);
-        chkMaps();
-
-        controlMap.clear();
-        testMap.clear();
-
-        putNode(15);
-        putNode(10);
-        putNode(18);
-        putNode(16);
-        putNode(17);
-        chkMaps();
+        pushMaster(new int[]{15,17,10,13,11});
+        clearMaster();
+        pushMaster(new int[]{15,10,18,16,17});
     }
 
     @Test
     public void leftRotateTest()
     {
-        putNode(1);
-        putNode(2);
-        putNode(3);
-        putNode(4);
-        putNode(5);
-        chkMaps();
-
-        testMap.clear();
-        controlMap.clear();
-        putNode(7);
-        putNode(5);
-        putNode(6);
-        chkMaps();
+        pushMaster(new int[]{1,2,3,4,5});
+        clearMaster();
+        pushMaster(new int[]{7,5,6});
     }
 
     @Test
     public void rightRotateTest()
     {
-        putNode(5);
-        putNode(4);
-        putNode(3);
-        putNode(2);
-        putNode(1);
-        chkMaps();
-
-        testMap.clear();
-        controlMap.clear();
-        putNode(5);
-        putNode(7);
-        putNode(6);
-        chkMaps();
+        pushMaster(new int[]{5,4,3,2,1});
+        clearMaster();
+        pushMaster(new int[]{5,7,6});
     }
 
     public void chkMaps()
@@ -216,12 +178,18 @@ public class mapTest extends Assert {
         pushDelMaster(nodes,nodes);
     }
 
-    private void pushDelMaster(int[]nodes,int[]nodesTodelete)
+    private void pushMaster(int[]nodes)
     {
         for (int i = 0; i<nodes.length;i++)
         {
             putNode(nodes[i]);
+            chkMaps();
         }
+    }
+
+    private void pushDelMaster(int[]nodes,int[]nodesTodelete)
+    {
+        pushMaster(nodes);
         for (int i = 0; i<nodesTodelete.length;i++)
         {
             delNode(nodesTodelete[i]);
