@@ -22,7 +22,7 @@ public class mapTest extends Assert {
     @Before
     public void generateData() {
         Random random = new Random();
-        int size = 1000;
+        int size = 7;
         values = new Integer[size];
         keys = new Integer[size];
         for (int i = 0; i < size; i++) {
@@ -41,29 +41,6 @@ public class mapTest extends Assert {
 
 
     }
-
-//    @Test
-//    public void putTest() {
-//
-//        for (int i = 0; i < keys.length; i++) {
-//            testMap.put(keys[i], values[i]);
-//            controlMap.put(keys[i], values[i]);
-//            checkMap(testMap, controlMap);
-//        }
-//    }
-
-//    @Test
-//    public void delTest1()
-//    {
-//        putNode(95);
-//        putNode(2);
-//        putNode(27);
-//        putNode(60);
-//        putNode(62);
-//        delNode(95);
-//        delNode(2);
-//        checkMap(testMap,controlMap);
-//    }
 
     @Test
     public void doublePut()
@@ -154,23 +131,6 @@ public class mapTest extends Assert {
         checkMap(testMap, controlMap);
     }
 
-//    @Test
-//    public void delTest() {
-//        for (int i = 0; i < keys.length; i++) {
-//            testMap.put(keys[i], values[i]);
-//            controlMap.put(keys[i], values[i]);
-//        }
-//
-//        for (int i = 0; i < keys.length; i++) {
-//            testMap.remove(keys[i]);
-//            controlMap.remove(keys[i]);
-//            checkMap(testMap, controlMap);
-//        }
-////
-//        assertTrue(testMap.isEmpty());
-//
-//    }
-
     @Test
     public void containsTest()
     {
@@ -206,108 +166,75 @@ public class mapTest extends Assert {
         assertNull(testMap.values());
     }
 
+
+    @Test
+    public void delTest_case0() //удаляемого элемента нет
+    {
+        delNode(666);
+    }
+
+
     @Test
     public void delTest_case1()   //новый корень
     {
-        delNode(15);
-
-        putNode(1);
-        putNode(2);
-        delNode(1);
-
-        chkMaps();
+        pushDelMaster(new int[]{1,2});
     }
 
 
     @Test
-    public void delTest_case2() //красный узел, чёрные потомки
+    public void delTest_case2() //Мы справа чёрный узел, красные потомки, чёрный брат, чёрный отец
     {
-        putNode(1);
-        putNode(2);
-        putNode(5);
-        putNode(6);
-        putNode(3);
-        delNode(5);
-        chkMaps();
+        pushDelMaster(new int[]{1,2,5,6,3},new int[]{5});
     }
 
-
     @Test
-    public void delTest_case3() //чёрный узел, красный брат
+    public void delTest_case3()  //чёрный узел, красный брат
     {
-        putNode(1);
-        putNode(2);
-        putNode(5);
-        putNode(6);
-        putNode(3);
-        delNode(1);
-        chkMaps();
+        pushDelMaster(new int[]{5,7,3,4,2},new int[]{7});
     }
 
-
     @Test
-    public void delTest_case4()  //чёрный узел, красный брат (симметр.)
+    public void delTest_case4()  //Мы слева, правый cын красный, отец чёрный, узел чёрный
     {
-        putNode(5);
-        putNode(7);
-        putNode(3);
-        putNode(4);
-        putNode(2);
-        delNode(7);
-        chkMaps();
+        pushDelMaster(new int[]{1, 3, 7, 6, 22, 17});
     }
 
+    @Test
+    public void delTest_case5()  //Мы справа, правый cын красный, отец чёрный, узел чёрный
+    {
+        pushDelMaster(new int[]{16, 15, 6, 1, 11, 8, 23});
+    }
 
     @Test
-    public void delTest_case5()
+    public void delTest_case6() //Мы слева, красный узел, чёрный брат
     {
+        pushDelMaster(new int[]{15, 8, 14, 5, 12, 21, 7});
+    }
 
-        String NODES = "17 5 15 7 13";
-        for (int i=0;i<NODES.split(" ").length;i++)
+    private void pushDelMaster(int[]nodes)
+    {
+        pushDelMaster(nodes,nodes);
+    }
+
+    private void pushDelMaster(int[]nodes,int[]nodesTodelete)
+    {
+        for (int i = 0; i<nodes.length;i++)
         {
-            putNode(Integer.parseInt(NODES.split(" ")[i]));
+            putNode(nodes[i]);
         }
-        delNode(17);  //чёрный предок чёрный брат чёрные сыновья
-        delNode(5);   //чёрный предок чёрный брат чёрные сыновья (сим)
-        putNode(6);
-           delNode(6);
-        delNode(13);  //чёрные сыновья чёрный брат красный предок
-
-
-//        for (int i = 0;i<5;i++)
-//        {
-//            putNode(keys[i]);
-//            System.out.println(keys[i]);
-//        }
-//
-//        for (int i = 0;i<5;i++)
-//        {
-//            delNode(keys[i]);
-//        }
+        for (int i = 0; i<nodesTodelete.length;i++)
+        {
+            delNode(nodesTodelete[i]);
+            chkMaps();
+        }
 
     }
-
-//    public void delTest_case6()
-//    {
-//        String NODES = "17 5 15 7 13";
-//        for (int i=0;i<NODES.split(" ").length;i++)
-//        {
-//            putNode(Integer.parseInt(NODES.split(" ")[i]));
-//        }
-//         delNode(17);
-//        delNode(15);
-//    }
-
 
     public void delNode(int key)
     {
         testMap.remove(key);
         controlMap.remove(key);
     }
-
-
-
-
 
     public void putNode(int key)
     {
